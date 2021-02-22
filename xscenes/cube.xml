@@ -1,0 +1,20 @@
+<!DOCTYPE xml>
+
+
+<Camera
+  lookfrom="0 0.0 7.0"
+  lookat="0 0 0"
+  fov="60"
+  />
+
+<Option anti-aliasing="2"/>
+
+<Object name="cube"  size="2" position="0 0.0 0" direction="0 1 0"   material="gold" noise="voronoi1" />
+<Object name="sphere" position="0. 0.0 0.0" radius="1.0" material="gold" color="1 0 0.4" noise="voronoi2" />
+<Object name="plan" position="1. 0.0 -10.0" radius="1.0"  direction="0  0 1" material="gold" noise="b_standard" />
+
+<Light position="0 5.0 0.0" color="1 0 1" />
+<Light position="0 0.0 5.0" color="1 0.5 0.6" />
+<Light position="0 5.0 5.0"  color="0.3 1 0"/>
+<Light position="3 5.0 5.0"/>
+<Light position="0 5.5.5 5.0"/>

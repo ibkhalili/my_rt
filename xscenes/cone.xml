@@ -1,0 +1,18 @@
+<!DOCTYPE xml>
+
+
+<Camera
+  lookfrom="0 0.0 25.0"
+  lookat="0 0 0"
+  fov="60"
+  />
+
+<Option anti-aliasing="2"/>
+
+
+<Object name="cone" radius="60"  direction="1 1 0"/>
+
+<Object
+<Light position="0 0 20.0"/>
+
+
