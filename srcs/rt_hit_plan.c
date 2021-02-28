@@ -28,15 +28,19 @@ int      cutt_plane(t_hit *rec, t_object *o)
 
 void			plane_uv(t_hit *rec, t_object *o)
 {
-	int scale;
-
-	rec->u = vec_dot(vec_div_k(vec_sub(rec->p, o->pos), o->noi.scale1),
-			o->vec2);//texture !!!!!!!!!
-	rec->v = vec_dot(vec_div_k(vec_sub(rec->p, o->pos), o->noi.scale1),
-			o->vec1);
-	rec->u = rec->u - floor(rec->u);
-	rec->v = rec->v - floor(rec->v);
-
+  if (o->txt)
+  {
+	  o->txt->scale = 0.1;
+	  rec->u = rt_frac(vec_dot(vec_pro_k(vec_sub(rec->p, o->pos), o->txt->scale), o->vec2));
+	  rec->v = rt_frac(vec_dot(vec_pro_k(vec_sub(rec->p, o->pos), o->txt->scale), o->vec1));
+	  return;
+  }
+  else 
+  {
+	 rec->u = rt_frac(vec_dot(vec_div_k(vec_sub(rec->p, o->pos), o->scale), o->vec2));
+	 rec->v = rt_frac(vec_dot(vec_div_k(vec_sub(rec->p, o->pos), o->scale), o->vec1));
+	 return;
+  }
 }
 
 int     rt_hit_plan(t_object *o, t_ray *r, t_hit *rec)
@@ -48,25 +52,13 @@ int     rt_hit_plan(t_object *o, t_ray *r, t_hit *rec)
 	if (t >= rec->closest || t <= MIN)
 		return (0);
 	rec->t = t;
+	if (rec->negative[0] <= rec->t && rec->t <= rec->negative[1])
+		return (0);
 	rec->p = vec_ray(r, rec->t);
-	rec->n = vec_dot(r->dir, o->rot) < 0? vec_pro_k(o->rot, -1) : o->rot;
+	rec->n = vec_dot(r->dir, o->rot) > 0 ? vec_pro_k(o->rot, -1) : o->rot;
 	plane_uv(rec, o);
 	return (1);
 }
-
-// int     rt_hit_plan_cube(t_object *o, t_ray *r, t_hit *rec)
-// {
-//     rec->t = ((vec_dot(o->rot, o->pos) - vec_dot(o->rot, r->origin))
-// 			/ vec_dot(o->rot, r->dir));
-// 	if (rec->t >= rec->closest || rec->t <= MIN)
-// 		return (0);
-// 	rec->p = vec_ray(r, rec->t);
-// 	rec->n = o->rot;
-// 	plane_uv(rec, o);
-//     if (cutt_plane(rec, o) == 0)
-//            return (0);
-//     return (1);
-// }
 
 int         rt_hit_care(t_object *o, t_ray *ray, t_hit *rec)
 {
@@ -79,7 +71,7 @@ int         rt_hit_care(t_object *o, t_ray *ray, t_hit *rec)
 		rec->p = vec_ray(ray, rec->t);
 		if (cutt_plane(rec, o) == 0)
 			return (0);
-		rec->n = vec_dot(ray->dir, o->rot) < 0? vec_pro_k(o->rot, -1) : o->rot;
+		rec->n = vec_dot(ray->dir, o->rot) > 0? vec_pro_k(o->rot, -1) : o->rot;
 		plane_uv(rec, o);
 		return (1);
 	}

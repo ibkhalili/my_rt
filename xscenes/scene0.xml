@@ -1,0 +1,18 @@
+<!DOCTYPE xml>
+
+<Camera
+  lookfrom="0  10 -20"
+  lookat="0 0 0"
+  fov="60"
+  />
+
+<Option aa="8.0"/>
+
+<Object name="cylinder" position="0 0 0.0" texture="xpm/brick.xpm" direction="0.0 1 0"  size="3" color="0.0 0.3 0"/>
+<Light position="10.0 -20 -15" intensity="1.0"/>
+<Light position="-3.0 5 -10" intensity="1.0"/>
+<Light position="10.0 10 -30" intensity="1.0"/>
+
+
+
+ 

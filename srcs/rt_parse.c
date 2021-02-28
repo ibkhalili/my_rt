@@ -26,9 +26,9 @@ void  rt_add_camera(t_tag *tag, t_rt *rt)
 void  rt_add_object(t_tag *tag, t_rt *rt)
 {
 	/*
-	   add different attributes Direction and Rotation !! redo rots functions!!
-	   */
-
+		add different attributes Direction and Rotation !! redo rots functions!!
+	*/
+	
 	t_object	*obj;
 	t_object	*tmp;
 
@@ -65,17 +65,15 @@ void  rt_add_object(t_tag *tag, t_rt *rt)
 			obj->r = rt_ctod(tag->attr->value, rt);    
 		else if (!ft_strcmp(tag->attr->name, "texture"))
 			obj->txt = rt_ctotxt(tag->attr->value, rt);
+		
 		else if (!ft_strcmp(tag->attr->name, "noise")  && (obj->noi.is_noise = 1))
 			obj->noi.type = rt_add_noise(tag->attr->value, rt);
-		else if (!ft_strcmp(tag->attr->name, "n_scale"))
-			obj->noi.scale1 = rt_ctod(tag->attr->value, rt);
-		else if (!ft_strcmp(tag->attr->name, "n_scale1"))
-			obj->noi.scale2 = rt_ctod(tag->attr->value, rt);
+		else if (!ft_strcmp(tag->attr->name, "scale"))
+			obj->scale = rt_ctod(tag->attr->value, rt);
 		else if (!ft_strcmp(tag->attr->name, "n_color"))
 			obj->noi.col1 = rt_ctovec(tag->attr->value, rt);
 		else if (!ft_strcmp(tag->attr->name, "n_color1"))
 			obj->noi.col2 = rt_ctovec(tag->attr->value, rt);
-
 
 		else if (!ft_strcmp(tag->attr->name, "material"))
 			obj->material = ft_strdup(tag->attr->value);
@@ -126,14 +124,14 @@ void  rt_add_option(t_tag *tag, t_rt *rt)
 {
 	while(tag->attr)
 	{
-		if (!ft_strcmp(tag->attr->name, "anti-aliasing"))
-			rt->scene->anti_aliasing = rt_ctod(tag->attr->value, rt); //atoi
-		//		if (!ft_strcmp(tag->attr->name, "filtre"))
-		//			rt->filter = fnct for filters;		
+		if (!ft_strcmp(tag->attr->name, "aa"))
+			rt->scene->aa = rt_ctod(tag->attr->value, rt); //atoi
+//		if (!ft_strcmp(tag->attr->name, "filtre"))
+//			rt->filter = fnct for filters;		
 		tag->attr = tag->attr->next;
 	}
-	if (rt->scene->anti_aliasing <= 0 )
-		rt_exit(rt, "anti-aliasing should be a positive int", EXIT_FAILURE);	
+	if (rt->scene->aa <= 0 )
+		rt_exit(rt, "aa should be a positive int", EXIT_FAILURE);	
 }
 
 void  xml_to_rt(t_xml *x, t_rt *rt)

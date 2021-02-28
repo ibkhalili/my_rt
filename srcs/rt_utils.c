@@ -1,5 +1,10 @@
 # include <rt.h>
 
+double      ffmax(double a, double b)
+{
+	return(a > b ? a : b);
+}
+
 void		ft_float_swap(double *a, double *b)
 {
 	double	tmp;
@@ -43,15 +48,22 @@ t_vec		rt_int_to_rgb(int x)
    return (vec_div_k(p, 256));
 }
 
-void		rt_mlx_putpixel(t_rt *rt, int x, int y, int color)
-{
-	if (x >= 0 && x < IMG_WIDTH
-			&& y >= 0 && y < IMG_HEIGHT)
-	{
-		rt->data[y * (int)IMG_WIDTH + x] = color;
-	}
-}
 t_vec		vec_ray(t_ray *r, double t)
 {
 	return (vec_add(r->origin, vec_pro_k(r->dir, t)));
+}
+
+int		is_equal(t_vec a, t_vec b)
+{
+	return ((a.x == b.x) && (a.y == b.y) && (a.z == b.z));
+}
+
+ double		radtodeg(double angle)
+{
+	return ((angle * 180) / M_PI);
+}
+
+double		degtorad(double angle)
+{
+	return ((angle * M_PI) / 180);
 }

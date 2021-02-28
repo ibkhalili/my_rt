@@ -1,4 +1,3 @@
-#include <rt.h>
 
 #include <rt.h>
 
@@ -8,38 +7,77 @@ void		sphere_uv(t_object *o, t_hit *rec)
 	double	theta;
 	t_vec	p;
     
- 	 p = vec_pro_k(vec_sub(rec->p, o->pos), 1); 
+ 	 p = vec_pro_k(vec_sub(rec->p, o->pos), 1.0); 
 	 p = vec(vec_dot(p, o->vec1), vec_dot(p, o->vec2), vec_dot(p, o->rot));
 	phi = atan2(p.z, p.x);
 	theta = asin(p.y / o->size);
 	rec->u = (phi + M_PI) / (2.0 * M_PI); 
 	rec->v = (theta + M_PI / 2.0) / M_PI ;
-	// rec->u = rec->u - floor(rec->u);
-	// rec->v = rec->v - floor(rec->v);
+	rec->u = rt_frac(rec->u);
+	rec->v = rt_frac(rec->v);
 	return;
 }
 
-int     rt_hit_sphere(t_object *obj, t_ray *ray, t_hit *rec)
+int     rt_sphere_params(t_object *obj, t_ray *ray, t_hit *rec)
 {
-	rec->or = vec_sub(ray->origin, obj->pos);// ray origin
+	rec->or = vec_sub(ray->origin, obj->pos);
 	rec->a = vec_dot(ray->dir, ray->dir);
 	rec->b = 2.0 * vec_dot(rec->or, ray->dir); 
 	rec->c = vec_dot(rec->or, rec->or) - (obj->size * obj->size);
 	rec->delta = rec->b * rec->b - 4.0 * rec->a * rec->c;
-
 	if (rec->delta >= 0.0)
 	{
 		rec->t0 = (-rec->b - sqrt(rec->delta)) / (2 * rec->a);
 		rec->t1 = (-rec->b + sqrt(rec->delta)) / (2 * rec->a);
-		rec->t = rec->t0 < rec->t1 ? rec->t0 : rec->t1;
-		if (rec->t >= EPS && rec->t < rec->closest)
+		(rec->t0 < rec->t1) ? 0 : ft_float_swap(&rec->t0, &rec->t1);
+		return (1);
+	}
+	return (0);
+}
+
+int		rt_hit_sphere(t_object *obj, t_ray *ray, t_hit *rec)
+{
+	//to parse
+	obj->is_sliced = 0;
+	obj->sl_vec = obj->vec2;
+	obj->sl_pnt = obj->pos;
+	//check if sl_pnt is inside the object before put o->is_sliced = 1;
+	//if (in_sphere(o) == 0)return 1;
+	//if (in_cylindr(o) == 0)return 1;
+	//if (in_cone(o) == 0)return 1;
+	if (rt_sphere_params(obj, ray, rec))
+	{
+		if (obj->is_sliced == 1 && rt_slicing(obj, ray, rec) == 0)
+			return (0);
+		if (negative(rec) == 0)
+			return (0);
+		if (rec->t > EPS && rec->t < rec->closest)
 		{
 			rec->p = vec_ray(ray, rec->t);
-			rec->n = vec_unit(vec_sub(rec->p, obj->pos));
+			if (rec->t == obj->sl_sl)
+				rec->n = vec_pro_k(obj->sl_vec , -1);
+			else if (rec->t <= rec->negative[1]+EPS && rec->t >= rec->negative[1]-EPS )
+				rec->n = rec->negative_normal;
+			else
+				rec->n = vec_div_k(vec_sub(rec->p, obj->pos), obj->size);
 			sphere_uv(obj, rec);
+			//for empty texture
+			 t_vec vec;
+			 vec = rt_get_color_from_texture(obj, &rec->u, &rec->v);
+			 if (vec.x < vec.z && vec.y < vec.z)
+			 {
+				rec->p = vec_ray(ray, rec->t1);
+				rec->n = vec_div_k(vec_sub(rec->p, obj->pos), -obj->size);
+				sphere_uv(obj, rec);
+				vec = rt_get_color_from_texture(obj, &rec->u, &rec->v);
+				if (vec.x < vec.z && vec.y < vec.z)
+					return 0;
+				else
+					return 1;
+				return (0);
+			 }//
 			return (1);
 		}
 	}
 	return (0);
 }
-

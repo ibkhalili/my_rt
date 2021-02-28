@@ -3,10 +3,8 @@
 #ifndef RT_H
 # define RT_H
 
-//# include <SDL.h>
 
 # include <rt_struct.h>
-# include <rt_define.h>
 
 #include<stdio.h> /// // 
 
@@ -14,11 +12,10 @@
 
 /* Tmp Parse  */
 
-void			rt_rot_dir(t_vec *d, t_vec r);
+t_vec			rt_rot_dir(t_vec *d, t_vec r);
 t_vec			rt_ctovec(char *str, t_rt *rt);
 double			rt_ctod(char *str, t_rt *rt);
 t_texture   	*rt_ctotxt(char *str, t_rt *rt);
-int     		rt_add_noise(char *val, t_rt *rt);
 
 void			rt_parser(t_rt *p, char **av);
 void			rt_check_cam(t_camera c, t_rt *rt);
@@ -36,48 +33,70 @@ int				ft_fr(char **str);
  */
 t_ray			rt_ray(t_vec a, t_vec b);
 t_ray			rt_get_ray(t_camera *p, double u, double v);
-t_vec 			rt_raytracer(t_thread *t, t_ray *r, int d);
+t_vec 			rt_raytracer(t_thread *t, t_hit rec, t_ray *r, int d);
 t_vec 			rt_anti_aliasing(t_thread *t, int col, int row);
-void			*rt_run(t_thread *t);
-void			rt_start(t_rt *rt);
+// void			rt_start(t_rt *rt);
 int				rt_draw(t_rt *rt);
+
+
+t_vec	    	anti_aa(t_thread *t, double col, double row, int select);
+int     		progress_bar(t_rt *rt);
+
+void			rt_start(t_rt *rt, void* (*rt_runner)(t_thread *t));//changed for pbar
+void			*rt_run(t_thread *t);
+void			*rt_run_50(t_thread *t);
+void			*rt_run_25(t_thread *t);
+void			*rt_run_12(t_thread *t);
+
 
 /*
  * Lighting
 */
 
-void			rt_ambient(t_light *l, t_thread *th, t_vec *col);
-int				rt_shading(t_thread *th, t_vec lo);
-int				rt_lighting(t_thread *th, t_light *t);
+void			rt_ambient(double amb, t_light *l, t_hit rec, t_vec *col);
+int				rt_shading(t_thread *th, t_hit r, t_light *l, t_vec lo, t_vec *c);
+t_vec				rt_lighting(t_thread *th, t_hit r, t_light *t);
+
 t_vec			rt_reflect(t_vec v, t_vec n);
-float	fresnel_ref(t_object *o, float ior, t_vec n, t_vec d);
+int       rt_refract(t_vec i, t_vec n, float ior, t_vec *rf);
+t_vec		rt_reflection(t_thread *th, t_ray *r, t_object *o, int dpth);
+t_vec		rt_refraction(t_thread *th, t_ray *r, t_object *o, int depth);
+
+
+float           rt_fresnel_ref(float ior, float n1, t_vec n, t_vec d);
 /*
  * Hit
 */
 
+int				rt_hit(t_scene *scene, t_ray *r, t_hit *record, double closest);
+
 int				rt_hit_sphere(t_object *obj, t_ray *ray, t_hit *record);
 int				rt_hit_cylinder(t_object *obj, t_ray *ray, t_hit *record);
-int				rt_hit_l_cylinder(t_object *o, t_ray *r, t_hit *rec);
+int				rt_hit_lcylinder(t_object *o, t_ray *r, t_hit *rec);
 int				rt_hit_cone(t_object *obj, t_ray *ray, t_hit *record);
-int				rt_hit_l_cone(t_object *o, t_ray *r, t_hit *rec);
+int				rt_hit_lcone(t_object *o, t_ray *r, t_hit *rec);
 int				rt_hit_plan(t_object *obj, t_ray *ray, t_hit *record);
-int             rt_hit_plan_cube(t_object *o, t_ray *r, t_hit *rec);
+int				rt_hit_care(t_object *o, t_ray *ray, t_hit *rec);
 
-int				rt_hit(t_scene *scene, t_ray *r, t_hit *record);
 int				rt_hit_torus(t_object *obj, t_ray *ray, t_hit *record);
 int             rt_hit_parabol(t_object *obj, t_ray *ray, t_hit *record);
 int     		rt_hit_cube(t_object *oo, t_ray *r, t_hit *record);
-int				rt_hit_care(t_object *o, t_ray *ray, t_hit *rec);
+
 int				rt_hit_glasse(t_object *o, t_ray *r,  t_hit *rec);
 int             rt_hit_cube_troue(t_object *obj, t_ray *ray, t_hit *record);
-int				rt_slicing(t_object *o, t_ray *r, t_hit *rec);
+
+void	        cylinder_uv(t_object *o, t_hit *rec);
+void            cone_uv(t_object *o, t_hit *rec);
+t_vec		    normale_cylinder(t_object *o, t_ray *r, t_hit *rec);
+t_vec           normale_cone(t_object *o, t_ray *r, t_hit *rec);
+// int				rt_slicing(t_object *o, t_ray *r, t_hit *rec);
 
 /*
  * Utils
 */
 
+double          ffmax(double a, double b);
 t_vec			vec_ray(t_ray *r, double t);
-void			rt_get_repere(t_object *ob);
 t_vec			rt_int_to_rgb(int x);
 void			rt_adjustment(t_vec *c);
 int				rt_rgb_to_int(t_vec c);
@@ -90,9 +109,17 @@ int				rt_is_zero(double delta);
 void			add_compos(t_object *o, t_vec r, int x, t_object *head);
 void			add_aux_o(t_object *o, t_vec r, int x, t_object *head);
 void    		get_cube_compos(t_object *obj);
-void            get_glasse_compos(t_object *obj);
 void			rt_check(t_object *compos, t_object *obj, int x);
-void		    ft_float_swap(double *a, double *b);
+t_object		*x_zero(t_object *compos, t_object *obj);
+t_object		*x_un(t_object *compos, t_object *obj);
+t_object		*x_deux(t_object *compos, t_object *obj);
+t_object		*x_trois(t_object *compos, t_object *obj);
+t_object		*x_quatre(t_object *compos, t_object *obj);
+t_vec			rotation(t_vec dir, t_vec rot);
+void		ft_float_swap(double *a, double *b);
+
+double	    	degtorad(double angle);
+double  		degtorad(double angle);
 void			rt_get_repere(t_object *ob);
 
 /*
@@ -102,12 +129,14 @@ void			rt_get_repere(t_object *ob);
 t_texture		*rt_init_txt(t_rt *rt);
 int				rt_load_txt(t_rt *rt, t_object *o);
 t_vec			rt_get_color_from_texture(t_object *o, double *u, double *v);
-t_vec  			torus_txt(t_hit *rec);
+t_vec  			rt_torus_noise(t_hit *rec);
+
+int     		rt_add_noise(char *val, t_rt *rt);
 t_vec			rt_noise_damier(t_hit *rec);
-t_vec			rt_noise(t_object *o, t_hit rec);
+t_vec			rt_noise(t_object *o, t_hit *rec);
 t_vec		    rt_rand1dto3d(double value);
 t_vec		    rt_rand3dto3d(t_vec value);
-t_vec               vec_floor(t_vec v);
+t_vec            vec_floor(t_vec v);
 long double		rand1dto1d(long double value, long double mutator);
 double		    rt_rand3dto1d(t_vec value, t_vec dot_dir);
 double		    rt_rand1dto1d(double value, double mutator);
@@ -117,6 +146,7 @@ double	        rt_frac(double value);
 t_vec	        rt_lerp(t_vec a, t_vec b, float f);
 t_vec           rt_voronoi(t_vec p,  t_object *o);
 t_vec           rt_start_voronoi(t_vec p, t_object *o);
+
 /*
  * Events
  */
@@ -141,4 +171,17 @@ void			rt_perror(void);
 void			rt_exit(t_rt *rt, char *msg, int err);
 int				rt_close(t_rt *rt);
 
+/*
+ * Negatives
+ */
+int		negative(t_hit *record);
+int			rt_negative_sphere(t_object *sphere, t_ray *r, t_hit *rec);
+int			rt_negative_cylinder(t_object *o, t_ray *r, t_hit *rec);
+int			rt_negative_cone(t_object *o, t_ray *r, t_hit *rec);
+
+
+/*
+ * Slicing
+*/
+int			rt_slicing(t_object *o, t_ray *r, t_hit *rec);
 #endif

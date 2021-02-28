@@ -19,20 +19,5 @@ t_vec		rt_get_color_from_texture(t_object *o, double *u, double *v)
     return(c);
 }
 
-t_vec  torus_txt(t_hit *rec)
-{
-	int i;
-	int j;
-    int oddity;
 
-	i = (int)(10 * rec->u);
-	j = (int)(10 * rec->v);
-	if ((i & 0x01) == (j & 0x01))
-		oddity = 1;
-	else
-		oddity = 0;
-	if ((((10 * rec->u - i) < 0.2) && oddity) || ((10 * rec->v - j) < 0.2))
-	  return (vec(0, 0, 0));
-	else 
-	  return (vec(1, 1, 1));
-}
+

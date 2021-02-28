@@ -2,52 +2,44 @@
 
 #include <rt.h>
 
-// t_object rt_sl_plan(t_object *o, t_vec ax)
-// {
-// 	t_object plan;
+void	rt_init_negative(t_hit *rec)
+{
+	rec->negative[0] = 0;
+	rec->negative[1] = 0;
+	rec->negative_normal = (t_vec){0, 0, 0};
+}
 
-// 	plan.pos = o->pos;
-// 	plan.rot = vec_pro_k(ax, -1);
-// 	plan.col = o->col;
-// 	plan.noi = o-> noi;
-// 	plan.txt = o->txt;
-// 	plan.mat = o->mat;
-// 	return (plan);
-// }
-// int			rt_slicing(t_object *o, t_ray *r, t_hit *rec)
-// {
-// 	t_vec     ax;
-// 	t_vec     my;
-// 	t_object  plan;
-// 	double  t;
-// 	t_vec p;
-
-// 	ax = vec_unit((o->sl_vec));
-// 	my = vec_unit(vec_sub(rec->p, vec_add(o->pos, o->sl_pnt)));
-// 	if (vec_dot(my, ax) <= 0)
-// 	{
-// 		plan = rt_sl_plan(o, ax);
-// 		t = rec->t1;
-// 		p = vec_ray(r, rec->t);
-// 		my = vec_unit(vec_sub(p, o->pos));
-// 		if (vec_dot(my, ax) <= 0)
-// 			return(0);
-// 		rec->t = t;
-// 		rec->p = p;
-// 		return(rt_hit_plan(&plan, r, rec));
-// 	}
-// 	return (1);
-// }
-
-int rt_hit(t_scene *scene, t_ray *r, t_hit *rec)
+int rt_hit(t_scene *scene, t_ray *r, t_hit *rec, double closest)
 {
 	t_object	*o;
 	int			check_hit;
 	t_hit		record;
 
+	//to parse
+	scene->n_exist = 1;
+	//example 1 sphere //file==cone.xml
+	scene->n_obj.pos = vec(0, -0, 0);
+	scene->n_obj.size = 4;
+	scene->n_obj.hit = rt_negative_sphere;
+	//ex 2 cylindre
+	// scene->n_obj.pos = vec(0, 0, 0);
+	// scene->n_obj.rot = vec_unit(vec(0, 1, 0));
+	// scene->n_obj.size = 3;
+	// scene->n_obj.hit = rt_negative_cylinder;
+	//ex3 cone
+	// scene->n_obj.pos = vec(0, 0, 0);
+	// scene->n_obj.rot = vec_unit(vec(0, 1, 0));
+	// scene->n_obj.size = tan(3.14/8);
+	// scene->n_obj.hit = rt_negative_cone;
+
+	//negatives clean code
+	if (scene->n_exist == 0)
+		rt_init_negative(&record);
+	else
+		scene->n_obj.hit(&scene->n_obj, r, &record);
 	check_hit = 0;
 	o = scene->object;
-	record.closest = MAX;
+	record.closest = closest;
 	record.curr_obj = NULL;
 	while (o)
 	{
@@ -60,6 +52,6 @@ int rt_hit(t_scene *scene, t_ray *r, t_hit *rec)
 			*rec = record;
 		}
 		o = o->next;
-	}	
+	}
 	return (check_hit);
 }
