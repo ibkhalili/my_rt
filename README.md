@@ -1,2 +1,2 @@
-# my_rt
+# RT (projet raytracing)
 projet infographie
