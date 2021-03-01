@@ -30,7 +30,7 @@ void			plane_uv(t_hit *rec, t_object *o)
 {
   if (o->txt)
   {
-	  o->txt->scale = 0.1;
+	  o->txt->scale = 0.01;
 	  rec->u = rt_frac(vec_dot(vec_pro_k(vec_sub(rec->p, o->pos), o->txt->scale), o->vec2));
 	  rec->v = rt_frac(vec_dot(vec_pro_k(vec_sub(rec->p, o->pos), o->txt->scale), o->vec1));
 	  return;

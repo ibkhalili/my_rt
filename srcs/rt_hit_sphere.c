@@ -1,21 +1,6 @@
 
 #include <rt.h>
 
-int    tranc_txt(t_ray *ray, t_object *obj, t_hit *rec)
-{
-    t_vec vec;
-   vec = rt_get_color_from_texture(obj, &rec->u, &rec->v);
-	if (vec.x < vec.z && vec.y < vec.z)
-	{
-		rec->p = vec_ray(ray, rec->t1);
-		rec->n = vec_div_k(vec_sub(rec->p, obj->pos), -obj->size);
-		sphere_uv(obj, rec);
-		vec = rt_get_color_from_texture(obj, &rec->u, &rec->v);
-		if (vec.x < vec.z && vec.y < vec.z)
-			 return 0;
-	}
-	return (1);
-}
 
 void		sphere_uv(t_object *o, t_hit *rec)
 {
@@ -32,6 +17,23 @@ void		sphere_uv(t_object *o, t_hit *rec)
 	rec->u = rt_frac(rec->u);
 	rec->v = rt_frac(rec->v);
 	return;
+}
+
+int    tranc_txt(t_ray *ray, t_object *obj, t_hit *rec)
+{
+    t_vec vec;
+   vec = rt_get_color_from_texture(obj, &rec->u, &rec->v);
+	if (vec.x < vec.z && vec.y < vec.z)
+	{
+		rec->p = vec_ray(ray, rec->t1);
+		rec->n = vec_div_k(vec_sub(rec->p, obj->pos), -obj->size);
+		sphere_uv(obj, rec);
+		vec = rt_get_color_from_texture(obj, &rec->u, &rec->v);
+		if (vec.x < vec.z && vec.y < vec.z)
+			 return 0;
+		return (1);
+	}
+	return (1);
 }
 
 int     rt_sphere_params(t_object *obj, t_ray *ray, t_hit *rec)
@@ -53,14 +55,6 @@ int     rt_sphere_params(t_object *obj, t_ray *ray, t_hit *rec)
 
 int		rt_hit_sphere(t_object *obj, t_ray *ray, t_hit *rec)
 {
-	//to parse
-	obj->is_sliced = 0;
-	obj->sl_vec = obj->vec2;
-	obj->sl_pnt = obj->pos;
-	//check if sl_pnt is inside the object before put o->is_sliced = 1;
-	//if (in_sphere(o) == 0)return 1;
-	//if (in_cylindr(o) == 0)return 1;
-	//if (in_cone(o) == 0)return 1;
 	if (rt_sphere_params(obj, ray, rec))
 	{
 		if (obj->is_sliced == 1 && rt_slicing(obj, ray, rec) == 0)
@@ -77,7 +71,7 @@ int		rt_hit_sphere(t_object *obj, t_ray *ray, t_hit *rec)
 			else
 				rec->n = vec_div_k(vec_sub(rec->p, obj->pos), obj->size);
 			sphere_uv(obj, rec);
-			if (!(tranc_txt(ray, obj, rec)))
+			if (obj->txt && !(tranc_txt(ray, obj, rec)))
 			    return(0);
 			return (1);
 		}

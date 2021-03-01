@@ -46,14 +46,7 @@ int     rt_cylinder_params(t_object *obj, t_ray *ray, t_hit *rec)
 
 int		rt_hit_cylinder(t_object *obj, t_ray *ray, t_hit *record)
 {
-	//to parse
-	obj->is_sliced = 1;
-	obj->sl_vec = vec(-1,-1,1);
-	obj->sl_pnt = vec(0, 0, 0);
-	//check if sl_pnt is inside the object before put o->is_sliced = 1;
-	//if (in_sphere(o) == 0)return 1;
-	//if (in_cylindr(o) == 0)return 1;
-	//if (in_cone(o) == 0)return 1;
+
     if (rt_cylinder_params(obj, ray, record))
 	{
 
@@ -61,7 +54,6 @@ int		rt_hit_cylinder(t_object *obj, t_ray *ray, t_hit *record)
 			return (0);
 		if (negative(record) == 0)
 			return (0);
-		//record->t = record->t0;
     	if (record->t < record->closest && record->t >= MIN)
    		{
 			record->p = vec_ray(ray, record->t);

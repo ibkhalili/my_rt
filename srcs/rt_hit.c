@@ -16,7 +16,7 @@ int rt_hit(t_scene *scene, t_ray *r, t_hit *rec, double closest)
 	t_hit		record;
 
 	//to parse
-	scene->n_exist = 1;
+	scene->n_exist = 0;
 	//example 1 sphere //file==cone.xml
 	scene->n_obj.pos = vec(0, -0, 0);
 	scene->n_obj.size = 4;
@@ -33,10 +33,10 @@ int rt_hit(t_scene *scene, t_ray *r, t_hit *rec, double closest)
 	// scene->n_obj.hit = rt_negative_cone;
 
 	//negatives clean code
-	if (scene->n_exist == 0)
-		rt_init_negative(&record);
-	else
-		scene->n_obj.hit(&scene->n_obj, r, &record);
+	// if (scene->n_exist == 0)
+	// 	rt_init_negative(&record);
+	// else
+	// 	scene->n_obj.hit(&scene->n_obj, r, &record);
 	check_hit = 0;
 	o = scene->object;
 	record.closest = closest;
