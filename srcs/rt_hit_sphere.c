@@ -1,6 +1,22 @@
 
 #include <rt.h>
 
+int    tranc_txt(t_ray *ray, t_object *obj, t_hit *rec)
+{
+    t_vec vec;
+   vec = rt_get_color_from_texture(obj, &rec->u, &rec->v);
+	if (vec.x < vec.z && vec.y < vec.z)
+	{
+		rec->p = vec_ray(ray, rec->t1);
+		rec->n = vec_div_k(vec_sub(rec->p, obj->pos), -obj->size);
+		sphere_uv(obj, rec);
+		vec = rt_get_color_from_texture(obj, &rec->u, &rec->v);
+		if (vec.x < vec.z && vec.y < vec.z)
+			 return 0;
+	}
+	return (1);
+}
+
 void		sphere_uv(t_object *o, t_hit *rec)
 {
 	double	phi;
@@ -56,26 +72,13 @@ int		rt_hit_sphere(t_object *obj, t_ray *ray, t_hit *rec)
 			rec->p = vec_ray(ray, rec->t);
 			if (rec->t == obj->sl_sl)
 				rec->n = vec_pro_k(obj->sl_vec , -1);
-			else if (rec->t <= rec->negative[1]+EPS && rec->t >= rec->negative[1]-EPS )
+			else if (rec->t <= rec->negative[1] + EPS && rec->t >= rec->negative[1] - EPS )
 				rec->n = rec->negative_normal;
 			else
 				rec->n = vec_div_k(vec_sub(rec->p, obj->pos), obj->size);
 			sphere_uv(obj, rec);
-			//for empty texture
-			 t_vec vec;
-			 vec = rt_get_color_from_texture(obj, &rec->u, &rec->v);
-			 if (vec.x < vec.z && vec.y < vec.z)
-			 {
-				rec->p = vec_ray(ray, rec->t1);
-				rec->n = vec_div_k(vec_sub(rec->p, obj->pos), -obj->size);
-				sphere_uv(obj, rec);
-				vec = rt_get_color_from_texture(obj, &rec->u, &rec->v);
-				if (vec.x < vec.z && vec.y < vec.z)
-					return 0;
-				else
-					return 1;
-				return (0);
-			 }//
+			if (!(tranc_txt(ray, obj, rec)))
+			    return(0);
 			return (1);
 		}
 	}
