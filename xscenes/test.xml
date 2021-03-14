@@ -1,0 +1,16 @@
+<!DOCTYPE xml>
+
+
+<Camera
+  lookfrom="0 0.0 10.0"
+  lookat="0 0 0"
+  fov="60"
+  />
+
+<Option aa="2"/>
+
+<Object name="cone" position="0.0 0.0 0.0" direction="0 1.0 0.0"
+rotation="0 0 0" scale="1"  texture="xpm/earth1.xpm" translation="0 0 0"
+  color="1.0 0.0 0.0" angle="60" txt_mv1="0" height="3" width="7" radius="3"/>
+
+ <Light position="0 0 10" color="1 1 1" />

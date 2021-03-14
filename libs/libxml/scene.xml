@@ -7,9 +7,7 @@
   fov="60"
   />
 
-<Object name="sphere" position="0 0 0" direction="3 0 0" rotation="1 0 0" 
-translation="0 4 0" radius="3" r="0.0" color="0.1 0.0 1.0" material="al" />
-
-<Light type="parallele" position="0 0 0"></Light>
-
-<Option aa="4.0"/>
+<Object name="rectangle" position="0 0 0" width="15" height="17" direction="3 0 0" rotation="1 0 0" 
+translation="0 4 0" texture="xpm/NY3.xpm" radius="3"  
+color="0.1 0.0 1.0"   
+material="al" />

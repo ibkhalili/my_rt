@@ -5,78 +5,63 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: belhatho <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2021/02/18 15:54:57 by belhatho          #+#    #+#             */
-/*   Updated: 2021/02/18 15:55:03 by belhatho         ###   ########.fr       */
+/*   Created: 2021/03/12 19:27:31 by belhatho          #+#    #+#             */
+/*   Updated: 2021/03/12 19:27:32 by belhatho         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <rt.h>
 
-int				rt_shading(t_thread *th, t_hit record, t_light *l, t_vec lo, t_vec *col)
+double		angle_between(t_vec a, t_vec b)
 {
-	t_hit	    rec;
-	t_object	*o;
-	t_vec	out_n;
-	float	ior;
-	t_ray	sr;
-
-
-	sr.dir = vec_unit(lo);
-	sr.origin = vec_add(th->rec.p, vec_pro_k(sr.dir, 0.001));
-
-	o = record.curr_obj;
-
-		if (rt_hit(th->rt->scene, &sr, &rec, vec_length(lo)))
-				return (1);
-		// {
-		// 	// if(!ft_strcmp(rec.curr_obj->name, "sphere"))
-		// 	// 	printf("--%s--\n", th->rec.curr_obj->name);
-		// 	// 	return(0);
-		// 	// if (o->refr == 0)
-		// }
-	// {
-		// if (o != rec.curr_obj)
-		// 	return (1);
-		// else
-		// {
-		// 	rt_refraction(th, &sr, rec.curr_obj, MAX_DEPTH);
-		// 	if (th->rec.curr_obj == rec.curr_obj)
-		// 	{				if (vec_dot(rec.ray->dir, vec_unit(vec_sub(rec.p, l->pos))) >= 0)
-		// 		{
-		// 			*col = vec_pro_k(vec3(1.0), vec_dot(rec.ray->dir,\
-		// 						vec_unit(vec_sub(rec.p, l->pos))));
-		// 			return(0);
-		// 		}
-		// 	}				// {
-		// 	// 	*col = vec_add(*col, vec_pro_k(l->col,\
-		// 	// 	ffmax(0.0, vec_dot(rec.ray->dir, rec.n))));
-		// 	// 	return(1);
-		// 	// }
-		// 	else
-		// 		return (0);
-		// }
-		// // 	else
-		// // 		*col = vec_add(*col, vec_pro_k(*col, ffmax(0.0, vec_dot(sr.dir, lo))));
-		// // 		return (1);
-		// //
-	// }
-	return (0);
+	return (acos(vec_dot(a, b) / (vec_length(a) * vec_length(b))));
 }
 
-void			rt_ambient(double amb, t_light *l, t_hit rec, t_vec *col)
+void		rt_ambient(double amb, t_light *l, t_hit rec, t_vec *col)
 {
 	t_object	*o;
-	double		ia;
-	t_vec		c;
-	/*
-	   recheck !!
-	   */
-	c = vec(0.0, 0.0, 0.0);
-	o = rec.curr_obj;
 
-	ia = amb;
-	ia *= (!l) ? 1 : l->intensity ;
-	*col = vec_pro_k(rec.col, ia);
+	o = rec.curr_obj;
+	*col = vec_add(vec3(0.0), vec_pro_k(rec.col, amb));
 	if (l)
-		*col = vec_prod(*col, vec_prod(o->mat.ka, l->col));
+		*col = vec_add(*col, vec_prod(*col, o->mat.ka));
+}
+
+t_li_sh		rt_init_shade(t_sh_ray sh, t_vec p)
+{
+	t_li_sh s;
+
+	s.o = NULL;
+	s.rec.curr_obj = NULL;
+	s.l_vec = (sh.l->type == PL_LIGHT) ?\
+		vec_pro_k(sh.l->dir, -1.0) : vec_sub(sh.l->pos, p);
+	s.closest = (sh.l->type == PL_LIGHT) ? 10000.0 : vec_length(s.l_vec);
+	return (s);
+}
+
+int			rt_shading(t_thread *th, t_sh_ray sh_r, t_vec *col, int depth)
+{
+	int			shade;
+	t_sh_ray	sc_r;
+	double		dot;
+	t_li_sh		s;
+
+	s = rt_init_shade(sh_r, th->rec.p);
+	shade = 0;
+	if (rt_hit(th->rt->scene, &sh_r.r, &(s.rec), s.closest) && (shade = 1))
+		s.o = s.rec.curr_obj;
+	// if (vec_dot(sh_r.r.dir, th->rec.ray->dir) > 0.0) && th->rec.curr_obj->refr == 0.0)
+	// 	return (shade);
+	if (depth > 1 && shade && s.o->refr != 0.0)
+	{
+		sc_r.r = rt_refraction(s.rec, sh_r.r, s.o);
+		sc_r.l = sh_r.l;
+		dot = vec_dot(vec_unit(sc_r.r.dir), vec_unit(s.l_vec));
+		if ((dot > 0.40))
+		{
+			*col = vec_pro_k(*col, dot * s.o->refr * 0.8);
+			return (rt_shading(th, sc_r, col, depth - 1));
+		}
+	}
+	return (shade);
 }

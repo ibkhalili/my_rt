@@ -1,16 +1,22 @@
 
-#include<rt.h>
+#include <rt.h>
 
-void    cone_uv(t_object *o, t_hit *rec)
+
+void	cone_uv(t_object *o, t_hit *rec)
 {
 	t_vec d;
+	double mv;
+    float r;
 
-	d = vec_pro_k(vec_sub(rec->p, o->pos),  o->scale);
-	d = vec(vec_dot(d, o->vec1), vec_dot(d, o->rot), vec_dot(d, o->vec2));
-	rec->u = (atan2(d.x, d.z) + M_PI / (2.0 * M_PI));
-	rec->v = d.y;
-	rec->u = rec->u - floor(rec->u);
-	rec->v = rec->v - floor(rec->v);
+	r = (float)o->txt.height / (float)o->txt.width;
+
+	d = vec_sub(rec->p, o->pos);
+	d = vec_add(d, vec_pro_k(o->rot, o->txt.mv1));r  
+	  d = ft_rot_vec(d, o->rot, o->txt.mv2); 
+	d = vec(vec_dot(d, o->vec2), vec_dot(d, o->rot), vec_dot(d, o->vec1));
+	rec->u= (atan2(d.x, d.z) + (M_PI )) / (2*M_PI);
+	rec->v= (d.y / o->radius) * r;
+
 }
 
 t_vec  normale_cone(t_object *o, t_ray *r, t_hit *rec)
@@ -26,8 +32,6 @@ t_vec  normale_cone(t_object *o, t_ray *r, t_hit *rec)
 
 int			rt_cone_params(t_object *o, t_ray *r, t_hit *rec)
 {
-	double min_sol;
-
 	rec->or = vec_sub(r->origin, o->pos);
 	rec->coef[0] = vec_dot(r->dir, r->dir) - ((1 + pow(tan(o->angle), 2))
 			* pow(vec_dot(r->dir, o->rot), 2));
@@ -41,19 +45,12 @@ int			rt_cone_params(t_object *o, t_ray *r, t_hit *rec)
 	rec->t0 = (-rec->coef[1] - sqrt(rec->delta)) / (2 * rec->coef[0]);
 	rec->t1 = (-rec->coef[1] + sqrt(rec->delta)) / (2 * rec->coef[0]);
 	(rec->t0 > rec->t1) ? ft_float_swap(&rec->t0, &rec->t1) : 0;
+	(rec->t0 <= EPS) ? ft_float_swap(&rec->t0, &rec->t1) : 0;
 	return (1);
 }
 
 int			rt_hit_cone(t_object *o, t_ray *r, t_hit *rec)
 {
-		//to parse
-	o->is_sliced = 1;
-	o->sl_vec = vec(-1,-1,1);
-	o->sl_pnt = vec(0, -10, 0);
-	//check if sl_pnt is inside the object before put o->is_sliced = 1;
-	//if (in_sphere(o) == 0)return 1;
-	//if (in_cylindr(o) == 0)return 1;
-	//if (in_cone(o) == 0)return 1;
 	if (rt_cone_params(o, r, rec))
 	{
 		if (o->is_sliced == 1 && rt_slicing(o, r, rec) == 0)
@@ -63,13 +60,17 @@ int			rt_hit_cone(t_object *o, t_ray *r, t_hit *rec)
 		if (rec->t < rec->closest && rec->t > EPS)
 		{
 			rec->p = vec_ray(r, rec->t);
-			if (rec->t == o->sl_sl)
-				rec->n = vec_pro_k(o->sl_vec , -1);
-			else if (rec->t == rec->negative[1])
+			if (rec->tx == 1)
+				rec->n = vec_pro_k(o->sl_vec, -1);
+			else if (rec->is_n == 1 && rec->t == rec->negative[1])
 				rec->n = rec->negative_normal;
+			else if (rec->t1 <= EPS)
+				rec->n = normale_cone(o, r, rec);
 			else
 				rec->n = normale_cone(o, r, rec);
 			cone_uv(o, rec);
+			if (o->txt.is_txt && o->txt.is_trans && !(trans_texture(r, o, rec)))
+	     	  return(0);
 			return (1);
 		}
 	}

@@ -1,27 +1,20 @@
 <!DOCTYPE xml>
 
 
-<Camera
-	lookfrom="0 2.0 10.0"
-	lookat="0 0 0"
-	fov="60"
-	/>
+<Camera	lookfrom="0 15.0 20.0" />
 
 
-<Option aa="1.0" />
+<Option aa="4" filter="sepia" stereo="0.6" >
+
+<Object name="plan" color="0 0.9 1.0" position="0 -3.0 -8.0"/>
 
 
-<Object name="plan" color="1 1 1"
-material="wate0r" noise="voronoi1"  n_scale="1.5" position="0 -5 0" />
+<Object name="sphere" color="1 1 1" radius="4.0" material="glass">
+<Object name="cube" color="1 0 0" size="1">
 
-<Object name="plan" texture="xpm/brick.xpm"  position="0 -6 0" />
+<Object name="sphere" material="gold" position="8 0 0" radius="4.0">
+ 
+<Object name="sphere" position="-8 0 0" color="0 0 1" material="ice" 
+ radius="4.0" >
 
-
-<Object name="sphere" position="-1.0 00 0" radius="2.0" color="0 0 01"
-  material="ice"/>
-
-<Object name="cube" position="01.0 2.0 4.0" radius="1.5"
-  material="a0l"/>
-
-
-<Light position=" 0 5.0 10.0 "/>
+<Light position="-0.0 15.0 50.0 "/>

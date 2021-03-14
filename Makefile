@@ -3,14 +3,27 @@ NAME = rt
 
 SRCS = rt.c\
 		rt_init.c\
+		rt_camera.c\
 		rt_auto_anti.c\
+		rt_anti_aliasing.c\
+		rt_run.c\
 		rt_parse.c\
+		rt_parse_add.c\
+		rt_parse_obj.c\
+		rt_parse_light.c\
 		rt_parse_utils.c\
 		rt_parse_check.c\
+		rt_parse_check1.c\
+		rt_events.c\
+		rt_events_keys.c\
+		rt_events_mouse.c\
+		rt_buttons.c\
+		rt_buttons_noi.c\
+		rt_btns_create.c\
+		rt_btns_create1.c\
 		rt_draw.c\
 		rt_draw_utils.c\
 		rt_hit.c\
-		rt_events.c\
 		rt_lighting.c\
 		rt_light_shading.c\
 		rt_ref.c\
@@ -25,7 +38,6 @@ SRCS = rt.c\
 		rt_hit_torus.c\
 		rt_hit_parabole.c\
 		rt_hit_cube.c\
-		rt_hit_dingdong.c\
 		rt_solve_quartic.c\
 		rt_solve_cubic.c\
 		rt_solve_quadric.c\
@@ -43,6 +55,13 @@ SRCS = rt.c\
 		rt_cube_compos.c\
 		rt_negatives.c\
 		rt_slicing.c\
+		rt_perlin.c\
+		rt_bmp_init.c\
+		rt_bmp_extractor.c\
+		rt_bmp_decode.c\
+		rt_bmp_imgs.c\
+		rt_filters.c\
+		rt_progress.c
 
 
 SRC = $(add prefix srcs/, $(SRCS))
@@ -51,7 +70,7 @@ SRCS_NORM = $(SRCS)
 OBJS_DIR = objs
 OBJ = $(SRCS:%.c=$(OBJS_DIR)/%.o)
 
-HEADERS = rt.h rt_struct.h rt_define.h
+HEADERS = rt.h rt_define.h rt_struct.h rt_struct_annx.h
 HEADER = headers
 HEADERS_NORM = $(HEADERS)
 
@@ -88,7 +107,7 @@ MLX = -lm -I $(MLX_DIR) -L $(MLX_DIR) -lmlx -lXext -lX11
 endif
 
 
-CFLAGS = #-Wall -Wextra -Werror
+CFLAGS = -Wall -Wextra # -Werror
 LIBFT_DIR = libs/libft
 XML_DIR = libs/libxml
 VEC_DIR = libs/libvec
@@ -110,7 +129,7 @@ $(NAME): $(OBJS_DIR) $(OBJ)
 $(OBJS_DIR):
 	@mkdir -p $@
 
-COMPILE_OBJECT = gcc -I headers/SDL2 -I headers $(CFLAGS) $(INCS) -o $@ -c $< && echo "$(OK_STRING)" || echo "$(KO_STRING)"
+COMPILE_OBJECT = gcc -I headers $(CFLAGS) $(INCS) -o $@ -c $< && echo "$(OK_STRING)" || echo "$(KO_STRING)"
 
 objs/%.o: srcs/%.c headers/rt.h headers/rt_define.h headers/rt_struct.h
 	@echo "$(CLEAR_LINE)$(_BLUE_COL)[$(NAME)]$(_CYAN_COL) Compiling [$(_END_COL)$(_YELLOW_COL)$<$(_END_COL)$(_CYAN_COL)] ==> [$(_YELLOW_COL)$@$(_END_COL)$(_CYAN_COL)] $(_END_COL)`$(COMPILE_OBJECT)`$(BEGIN_LINE)"

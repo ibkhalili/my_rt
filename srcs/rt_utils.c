@@ -1,5 +1,18 @@
 # include <rt.h>
 
+void			my_mlx_putpixel(t_vec *data, int x, int y, t_vec color)
+{
+	if (x >= 0 && x < IMG_WIDTH && y >= 0 && y < IMG_HEIGHT)
+		data[y * (int)IMG_WIDTH + x] = color;
+}
+
+t_vec			my_mlx_getpixel(t_vec *data, int x, int y)
+{
+	if (x >= 0 && x < IMG_WIDTH && y >= 0 && y < IMG_HEIGHT)
+		return (data[y * (int)IMG_WIDTH + x]);
+	return ((t_vec){0, 0, 0});
+}
+
 double      ffmax(double a, double b)
 {
 	return(a > b ? a : b);
@@ -58,7 +71,7 @@ int		is_equal(t_vec a, t_vec b)
 	return ((a.x == b.x) && (a.y == b.y) && (a.z == b.z));
 }
 
- double		radtodeg(double angle)
+double		radtodeg(double angle)
 {
 	return ((angle * 180) / M_PI);
 }

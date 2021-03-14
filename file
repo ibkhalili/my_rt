@@ -1,0 +1,12 @@
+<!DOCTYPE xml>
+
+<Camera 
+
+    lookfrom="0.0 0.0 1"
+    lookat="0 0 0"
+/> 
+
+<Object name="plan" position="0 0 0" direction="0 0 0" position="0 0 0" />
+<Object name="plan" position="0 0 0" direction="0 0 1" position="0 0 -2"/>
+
+<Light position="0 0 1" />

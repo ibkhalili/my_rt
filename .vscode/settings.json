@@ -1,3 +1,9 @@
 {
-	"C_Cpp.default.compilerPath": "/Users/msoulaim/.vscode/extensions/bartmanabyss.amiga-debug-1.0.0\\bin\\opt\\bin\\m68k-amiga-elf-gcc.exe"
+    "files.associations": {
+        "rt.h": "c",
+        "rt_struct.h": "c",
+        "rt_define.h": "c",
+        "mlx.h": "c",
+        "__locale": "c"
+    }
 }
